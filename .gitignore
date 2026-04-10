@@ -1,0 +1,17 @@
+.DS_Store
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+
+# OMX runtime (keep planning/context artifacts available to workers)
+.omx/logs/
+.omx/state/
+.omx/metrics.json
+.omx/tmux-hook.json
+.omx/notepad.md
+.omx/drafts/

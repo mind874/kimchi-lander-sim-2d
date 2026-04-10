@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kimchi-lander-sim-2d"
+version = "0.1.0"
+description = "Desktop-grade 2D rocket lander engineering simulator"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=1.26",
+  "scipy>=1.13",
+  "PySide6>=6.7",
+  "pyqtgraph>=0.13",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

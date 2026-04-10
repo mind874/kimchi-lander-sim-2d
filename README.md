@@ -64,7 +64,11 @@ The nonlinear plant and the linearized hover model are intentionally separated:
 
 That separation is deliberate so future work can add higher-fidelity plant effects without hiding what the linear controller is actually designed against.
 
-## Running locally
+## Primary frontend: Electron + React
+
+The **canonical GUI** is now the Electron shell with the React renderer. The
+Python simulation/control code remains the single source of truth, but the
+React workstation is the primary product surface.
 
 Fastest setup:
 
@@ -72,54 +76,33 @@ Fastest setup:
 ./scripts/bootstrap.sh
 ```
 
-Or via npm:
+Launch the primary frontend:
 
 ```bash
-npm run bootstrap
-```
-
-Manual setup:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e . pytest
-python -m lander_sim
-```
-
-## Running the Electron + React frontend
-
-The repository now includes an Electron shell with a React frontend that talks to
-the same Python simulation core through a local bridge module.
-
-First install the Python environment:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e . pytest
-```
-
-Or use the one-command bootstrap:
-
-```bash
-./scripts/bootstrap.sh
-```
-
-Then install and run the Electron frontend:
-
-```bash
-npm run electron:install
 npm run electron:dev
 ```
 
-Additional Electron commands:
+Build/start the packaged renderer locally:
 
 ```bash
-npm run electron:build   # build the React renderer
-npm run electron:start   # open Electron against the built renderer
-npm run python:start     # launch the original PySide desktop UI
-npm run python:test      # run the pytest suite
+npm run electron:build
+npm run electron:start
+```
+
+## Legacy / internal fallback: PySide desktop shell
+
+The original PySide UI is still available as a fallback/debug surface during the
+migration, but it is no longer the primary UX investment area.
+
+```bash
+npm run python:start
+```
+
+Other useful commands:
+
+```bash
+npm run bootstrap
+npm run python:test
 npm run bridge:list-presets
 ```
 

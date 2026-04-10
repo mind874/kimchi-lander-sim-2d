@@ -15,3 +15,4 @@ build/
 .omx/tmux-hook.json
 .omx/notepad.md
 .omx/drafts/
+.omx/

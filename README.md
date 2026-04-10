@@ -66,6 +66,20 @@ That separation is deliberate so future work can add higher-fidelity plant effec
 
 ## Running locally
 
+Fastest setup:
+
+```bash
+./scripts/bootstrap.sh
+```
+
+Or via npm:
+
+```bash
+npm run bootstrap
+```
+
+Manual setup:
+
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
@@ -86,6 +100,12 @@ source .venv/bin/activate
 python -m pip install -e . pytest
 ```
 
+Or use the one-command bootstrap:
+
+```bash
+./scripts/bootstrap.sh
+```
+
 Then install and run the Electron frontend:
 
 ```bash
@@ -98,6 +118,9 @@ Additional Electron commands:
 ```bash
 npm run electron:build   # build the React renderer
 npm run electron:start   # open Electron against the built renderer
+npm run python:start     # launch the original PySide desktop UI
+npm run python:test      # run the pytest suite
+npm run bridge:list-presets
 ```
 
 ## Verification

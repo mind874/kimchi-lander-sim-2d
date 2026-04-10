@@ -2,6 +2,10 @@
   "name": "kimchi-lander-sim-2d-workspace",
   "private": true,
   "scripts": {
+    "bootstrap": "./scripts/bootstrap.sh",
+    "python:start": "sh -lc '. .venv/bin/activate && python -m lander_sim'",
+    "python:test": "sh -lc '. .venv/bin/activate && pytest -q'",
+    "bridge:list-presets": "sh -lc '. .venv/bin/activate && python -m lander_sim.bridge list-presets'",
     "electron:install": "npm --prefix electron-app install",
     "electron:dev": "npm --prefix electron-app run dev",
     "electron:build": "npm --prefix electron-app run build",

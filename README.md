@@ -1,74 +1,10 @@
 # Kimchi Lander Sim 2D
 
-Kimchi Lander Sim 2D is a **desktop-grade engineering simulator** for a planar rocket hop vehicle. It is built to compare **open-loop**, **cascaded PID**, and **state-space / LQR-style full-state feedback** controllers on the same nonlinear 2D rigid-body model.
+Kimchi Lander Sim 2D is a **desktop-grade engineering simulator** for a planar rocket hop vehicle. It compares **open-loop**, **cascaded PID**, and **state-space / LQR-style full-state feedback** controllers on the same nonlinear 2D rigid-body model.
 
-This is **not a game**. The goal is an understandable, tunable environment for guidance, control, parameter studies, and visualization.
-
-## Stack
-
-- **Python 3.11+**
-- **PySide6** desktop UI
-- **pyqtgraph** live plots and overlays
-- **NumPy / SciPy** for simulation math, linearization, and LQR design
-
-## Current MVP
-
-The current app includes:
-
-- planar rigid-body dynamics with states `x, z, vx, vz, theta, omega, m`
-- fixed-step **RK4** and **Euler** integration
-- gravity, thrust-vector transforms, pitch torque, optional mass depletion
-- **open-loop**, **PID**, and **state-space** controller modes
-- hover / translation / hop-style guidance targets
-- editable vehicle, simulation, PID, state-space, and guidance settings
-- dark-theme desktop UI with:
-  - settings tabs
-  - 2D scene renderer
-  - live playback controls
-  - synchronized plots
-  - analytics summary
-- built-in presets for hover, poor/well tuned PID, state-space hover, translation, landing with depletion, RCS-only pitch test, and gimbaled-engine pitch stabilization
-- save/load JSON configurations
-- retained-run comparison overlays
-
-## Project layout
-
-```text
-src/lander_sim/
-├── dynamics/      # plant, integrators, linearization, state/parameter models
-├── control/       # PID, state-space, guidance, actuator allocation
-├── simulation/    # runner, history, analytics, presets/config parsing
-├── ui/            # main window, scene renderer, panels, plotting, playback
-├── data/presets/  # shipped JSON presets
-└── utils/         # config IO and math/unit helpers
-```
-
-## Model assumptions and simplifications
-
-The simulator is intentionally explicit and readable, but still simplified:
-
-- **2D planar only** — no roll, yaw, or 3D coupling
-- **Rigid body** — no structural flexibility or slosh model
-- **Flat ground plane** — touchdown classification rather than a full contact solver
-- **State-space controller is local to hover trim** — it uses a hover linearization and mass-aware thrust feedforward, but it is still a linear controller around a nominal operating condition
-- **Actuator allocation is explicit** — the controller requests abstract thrust / pitch torque, and the allocator maps that into gimbal-only, RCS-only, or hybrid actuation
-- **Optional fidelity hooks** — drag, wind, engine lag, CG/inertia variation, observers, Monte Carlo, and 3D expansion are intentionally left as future seams
-
-## Engineering note
-
-The nonlinear plant and the linearized hover model are intentionally separated:
-
-- `dynamics/vehicle_model.py` contains the nonlinear planar equations used for simulation
-- `dynamics/linearization.py` contains the hover-trim linear model used by the state-space controller
-- `control/state_space_controller.py` exposes the controller matrices and closed-loop poles used in the UI
-
-That separation is deliberate so future work can add higher-fidelity plant effects without hiding what the linear controller is actually designed against.
+This is **not a game**. The primary user experience is now the **Electron + React cockpit**. The Python package remains the simulation/control authority and exposes the bridge used by the frontend.
 
 ## Primary frontend: Electron + React
-
-The **canonical GUI** is now the Electron shell with the React renderer. The
-Python simulation/control code remains the single source of truth, but the
-React workstation is the primary product surface.
 
 Fastest setup:
 
@@ -89,45 +25,116 @@ npm run electron:build
 npm run electron:start
 ```
 
-## Legacy / internal fallback: PySide desktop shell
+## Python role in the product
 
-The original PySide UI is still available as a fallback/debug surface during the
-migration, but it is no longer the primary UX investment area.
+Python remains the source of truth for:
+
+- nonlinear planar dynamics
+- hover linearization
+- PID / state-space controller implementation
+- preset loading and config serialization
+- simulation execution and analytics
+
+The Python entrypoint no longer launches a separate PySide GUI. Instead:
 
 ```bash
-npm run python:start
+python -m lander_sim
 ```
 
-Other useful commands:
+prints launch guidance, and:
 
 ```bash
-npm run bootstrap
-npm run python:test
-npm run bridge:list-presets
+python -m lander_sim bridge list-presets
+python -m lander_sim bridge get-preset stable_hover.json
+python -m lander_sim bridge run --config-file path/to/config.json
 ```
+
+accesses the bridge CLI directly.
+
+## Stack
+
+- **Python 3.11+**
+- **Electron** desktop shell
+- **React + Vite** renderer
+- **NumPy / SciPy** for simulation math, linearization, and LQR design
+
+## Current MVP
+
+The current app includes:
+
+- planar rigid-body dynamics with states `x, z, vx, vz, theta, omega, m`
+- fixed-step **RK4** and **Euler** integration
+- gravity, thrust-vector transforms, pitch torque, optional mass depletion
+- **open-loop**, **PID**, and **state-space** controller modes
+- hover / translation / hop-style guidance targets
+- editable vehicle, simulation, PID, state-space, and guidance settings
+- Electron/React engineering cockpit with:
+  - preset/config dock
+  - mission/config editor
+  - control-law editor
+  - world view and playback scrubber
+  - retained-run comparison bank
+  - controller inspector
+  - synchronized plots and analytics
+- built-in presets for hover, poor/well tuned PID, state-space hover, translation, landing with depletion, RCS-only pitch test, and gimbaled-engine pitch stabilization
+- save/load JSON configurations
+- retained-run comparison overlays
+
+## Project layout
+
+```text
+src/lander_sim/
+├── dynamics/      # plant, integrators, linearization, state/parameter models
+├── control/       # PID, state-space, guidance, actuator allocation
+├── simulation/    # runner, history, analytics, presets/config parsing
+├── data/presets/  # shipped JSON presets
+├── bridge.py      # Python bridge used by the Electron frontend
+└── utils/         # config IO and math/unit helpers
+
+electron-app/
+├── electron/      # main/preload shell
+├── src/app/       # app shell + state hooks
+├── src/features/  # feature-sliced renderer modules
+├── src/shared/    # bridge adapters and helpers
+└── src/components/# shared visualization components
+```
+
+## Model assumptions and simplifications
+
+The simulator is intentionally explicit and readable, but still simplified:
+
+- **2D planar only** — no roll, yaw, or 3D coupling
+- **Rigid body** — no structural flexibility or slosh model
+- **Flat ground plane** — touchdown classification rather than a full contact solver
+- **State-space controller is local to hover trim** — it uses a hover linearization and mass-aware thrust feedforward, but it is still a linear controller around a nominal operating condition
+- **Actuator allocation is explicit** — the controller requests abstract thrust / pitch torque, and the allocator maps that into gimbal-only, RCS-only, or hybrid actuation
+- **Optional fidelity hooks** — drag, wind, engine lag, CG/inertia variation, observers, Monte Carlo, and 3D expansion are intentionally left as future seams
+
+## Engineering note
+
+The nonlinear plant and the linearized hover model are intentionally separated:
+
+- `dynamics/vehicle_model.py` contains the nonlinear planar equations used for simulation
+- `dynamics/linearization.py` contains the hover-trim linear model used by the state-space controller
+- `control/state_space_controller.py` exposes the controller matrices and closed-loop poles used by the frontend inspector
+- `bridge.py` is the only supported interface from the JS frontend into Python runtime behavior
+
+This keeps the React/Electron shell thin and avoids forking simulator logic into JavaScript.
 
 ## Verification
 
 ```bash
-source .venv/bin/activate
-python -m compileall src tests
-pytest -q
-QT_QPA_PLATFORM=offscreen python - <<'PY'
-from PySide6.QtWidgets import QApplication
-from lander_sim.ui.main_window import MainWindow
-app = QApplication.instance() or QApplication([])
-window = MainWindow()
-window.run_simulation()
-print(window.current_result.run_name, len(window.current_result.samples))
-window.close()
-PY
+npm run python:test
+npm run bridge:list-presets
+npm run electron:build
 ```
 
-Electron/React verification:
+Direct bridge verification example:
 
 ```bash
-npm run electron:build
-python -m lander_sim.bridge list-presets
+source .venv/bin/activate
+python -m lander_sim bridge list-presets
+python -m lander_sim bridge get-preset stable_hover.json
 ```
 
 ## Presets
@@ -153,3 +160,4 @@ Planned extension seams already exist for:
 - richer actuator / engine dynamics
 - CSV / plot export polish
 - higher-fidelity contact and eventually 3D dynamics
+- packaged Electron distribution with bundled Python runtime

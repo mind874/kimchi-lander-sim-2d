@@ -28,15 +28,17 @@ npm --prefix electron-app install
 cat <<'MSG'
 Bootstrap complete.
 
-Python desktop app:
-  source .venv/bin/activate
-  python -m lander_sim
-
-Electron + React frontend:
+Primary GUI (Electron + React):
   npm run electron:dev
 
 Verification:
-  source .venv/bin/activate
-  pytest -q
+  npm run python:test
+  npm run bridge:list-presets
   npm run electron:build
+
+Python no longer ships a standalone PySide GUI. Use:
+  python -m lander_sim
+for launch guidance, or:
+  python -m lander_sim bridge list-presets
+for bridge CLI access.
 MSG

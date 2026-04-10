@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "preset_name": "Landing With Mass Depletion",
+  "description": "Controlled descent to a pad with propellant usage enabled so landing analytics and event logging can be validated.",
+  "controller_mode": "state_space",
+  "simulation": {
+    "dt_s": 0.02,
+    "duration_s": 18.0,
+    "integrator": "rk4"
+  },
+  "vehicle": {
+    "dry_mass_kg": 1200.0,
+    "initial_mass_kg": 1550.0,
+    "inertia_kg_m2": 970.0,
+    "max_thrust_n": 23500.0,
+    "gimbal_limit_deg": 10.0,
+    "rcs_torque_limit_n_m": 1800.0,
+    "mass_flow_enabled": true
+  },
+  "initial_state": {
+    "x_m": 1.0,
+    "z_m": 35.0,
+    "vx_mps": 0.0,
+    "vz_mps": -1.0,
+    "theta_deg": 0.0,
+    "omega_deg_s": 0.0
+  },
+  "target": {
+    "x_m": 0.0,
+    "z_m": 0.0,
+    "theta_deg": 0.0
+  },
+  "guidance": {
+    "mode": "sequence",
+    "segments": [
+      {
+        "name": "brake",
+        "duration_s": 8.0,
+        "target": {
+          "x_m": 0.0,
+          "z_m": 12.0
+        }
+      },
+      {
+        "name": "final_descent",
+        "duration_s": 10.0,
+        "target": {
+          "x_m": 0.0,
+          "z_m": 0.0
+        }
+      }
+    ]
+  },
+  "controller": {
+    "state_space": {
+      "state_vector": [
+        "x",
+        "z",
+        "vx",
+        "vz",
+        "theta",
+        "omega"
+      ],
+      "input_vector": [
+        "delta_thrust",
+        "pitch_torque"
+      ],
+      "q_diagonal": [
+        24.0,
+        36.0,
+        14.0,
+        22.0,
+        38.0,
+        16.0
+      ],
+      "r_diagonal": [
+        0.2,
+        0.55
+      ]
+    }
+  }
+}

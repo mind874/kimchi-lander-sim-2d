@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "preset_name": "Well Tuned PID",
+  "description": "A tighter damped hover controller for comparison against the intentionally poor PID tuning.",
+  "controller_mode": "pid",
+  "simulation": {
+    "dt_s": 0.02,
+    "duration_s": 12.0,
+    "integrator": "rk4"
+  },
+  "vehicle": {
+    "dry_mass_kg": 1200.0,
+    "initial_mass_kg": 1450.0,
+    "inertia_kg_m2": 920.0,
+    "max_thrust_n": 22000.0,
+    "gimbal_limit_deg": 10.0,
+    "rcs_torque_limit_n_m": 1500.0
+  },
+  "initial_state": {
+    "x_m": 0.5,
+    "z_m": 19.5,
+    "vx_mps": 0.0,
+    "vz_mps": 0.0,
+    "theta_deg": 0.5,
+    "omega_deg_s": 0.0
+  },
+  "target": {
+    "x_m": 0.0,
+    "z_m": 20.0,
+    "theta_deg": 0.0
+  },
+  "guidance": {
+    "mode": "hover"
+  },
+  "controller": {
+    "pid": {
+      "altitude": {
+        "kp": 1.65,
+        "ki": 0.22,
+        "kd": 0.95
+      },
+      "lateral": {
+        "kp": 0.55,
+        "ki": 0.0,
+        "kd": 0.36
+      },
+      "attitude": {
+        "kp": 9.25,
+        "ki": 0.12,
+        "kd": 3.75
+      }
+    }
+  }
+}

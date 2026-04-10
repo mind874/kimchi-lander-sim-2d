@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "preset_name": "Gimbaled Pitch Stabilization",
+  "description": "Gimbal-only pitch stabilization with a fixed hover target and an initial pitch error.",
+  "controller_mode": "pid",
+  "allocator_mode": "gimbal_only",
+  "simulation": {
+    "dt_s": 0.02,
+    "duration_s": 10.0,
+    "integrator": "rk4"
+  },
+  "vehicle": {
+    "dry_mass_kg": 1200.0,
+    "initial_mass_kg": 1450.0,
+    "inertia_kg_m2": 920.0,
+    "max_thrust_n": 22000.0,
+    "gimbal_limit_deg": 12.0,
+    "gimbal_rate_limit_deg_s": 60.0,
+    "rcs_torque_limit_n_m": 1500.0
+  },
+  "initial_state": {
+    "x_m": 0.0,
+    "z_m": 18.0,
+    "vx_mps": 0.0,
+    "vz_mps": 0.0,
+    "theta_deg": 8.0,
+    "omega_deg_s": 0.0
+  },
+  "target": {
+    "x_m": 0.0,
+    "z_m": 18.0,
+    "theta_deg": 0.0
+  },
+  "guidance": {
+    "mode": "hover"
+  },
+  "controller": {
+    "pid": {
+      "altitude": {
+        "kp": 1.5,
+        "ki": 0.2,
+        "kd": 0.85
+      },
+      "lateral": {
+        "kp": 0.45,
+        "ki": 0.0,
+        "kd": 0.25
+      },
+      "attitude": {
+        "kp": 10.5,
+        "ki": 0.18,
+        "kd": 4.4
+      }
+    }
+  }
+}

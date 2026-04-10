@@ -109,7 +109,7 @@ class StateSpaceController:
         control_delta = -self.K @ error
         delta_thrust = min(max(float(control_delta[0]), -self.config.max_delta_thrust), self.config.max_delta_thrust)
         pitch_torque = min(max(float(control_delta[1]), -self.config.max_pitch_torque), self.config.max_pitch_torque)
-        target_thrust = self.design.linearization.trim_input[0] + delta_thrust
+        target_thrust = self.vehicle.hover_thrust(state.m) + delta_thrust
         debug = {
             "delta_thrust": delta_thrust,
             "pitch_torque": pitch_torque,

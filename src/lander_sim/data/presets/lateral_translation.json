@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "preset_name": "Lateral Translation",
+  "description": "Translate 8 m laterally while holding altitude so PID and state-space runs can be overlaid on the same mission profile.",
+  "controller_mode": "state_space",
+  "allocator_mode": "hybrid",
+  "simulation": {
+    "dt_s": 0.02,
+    "duration_s": 16.0,
+    "integrator": "rk4"
+  },
+  "vehicle": {
+    "dry_mass_kg": 1200.0,
+    "initial_mass_kg": 1450.0,
+    "inertia_kg_m2": 920.0,
+    "max_thrust_n": 22000.0,
+    "gimbal_limit_deg": 10.0,
+    "gimbal_rate_limit_deg_s": 45.0,
+    "rcs_torque_limit_n_m": 1500.0
+  },
+  "initial_state": {
+    "x_m": 0.0,
+    "z_m": 22.0,
+    "vx_mps": 0.0,
+    "vz_mps": 0.0,
+    "theta_deg": 0.0,
+    "omega_deg_s": 0.0
+  },
+  "target": {
+    "x_m": 8.0,
+    "z_m": 22.0,
+    "theta_deg": 0.0
+  },
+  "guidance": {
+    "mode": "sequence",
+    "segments": [
+      {
+        "name": "settle",
+        "duration_s": 2.0,
+        "target": {
+          "x_m": 0.0,
+          "z_m": 22.0
+        }
+      },
+      {
+        "name": "translate",
+        "duration_s": 10.0,
+        "target": {
+          "x_m": 8.0,
+          "z_m": 22.0
+        }
+      },
+      {
+        "name": "hold",
+        "duration_s": 4.0,
+        "target": {
+          "x_m": 8.0,
+          "z_m": 22.0
+        }
+      }
+    ]
+  },
+  "controller": {
+    "pid": {
+      "altitude": {
+        "kp": 1.6,
+        "ki": 0.22,
+        "kd": 0.95
+      },
+      "lateral": {
+        "kp": 0.6,
+        "ki": 0.0,
+        "kd": 0.28
+      },
+      "attitude": {
+        "kp": 9.2,
+        "ki": 0.1,
+        "kd": 3.7
+      }
+    },
+    "state_space": {
+      "state_vector": [
+        "x",
+        "z",
+        "vx",
+        "vz",
+        "theta",
+        "omega"
+      ],
+      "input_vector": [
+        "delta_thrust",
+        "pitch_torque"
+      ],
+      "q_diagonal": [
+        26.0,
+        20.0,
+        12.0,
+        12.0,
+        45.0,
+        16.0
+      ],
+      "r_diagonal": [
+        0.2,
+        0.5
+      ]
+    }
+  }
+}

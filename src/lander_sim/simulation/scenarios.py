@@ -66,6 +66,32 @@ def list_preset_paths() -> list[Path]:
     return ordered + remainder
 
 
+def preset_summary(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text())
+    return {
+        "file_name": path.name,
+        "preset_name": str(payload.get("preset_name", path.stem)),
+        "description": str(payload.get("description", "")),
+        "controller_mode": str(payload.get("controller_mode", "pid")),
+        "allocator_mode": str(payload.get("allocator_mode", "hybrid")),
+    }
+
+
+def list_preset_summaries() -> list[dict[str, Any]]:
+    return [preset_summary(path) for path in list_preset_paths()]
+
+
+def find_preset_path(identifier: str) -> Path:
+    normalized = identifier.strip().lower()
+    for path in list_preset_paths():
+        if path.name.lower() == normalized or path.stem.lower() == normalized:
+            return path
+        payload = json.loads(path.read_text())
+        if str(payload.get("preset_name", "")).strip().lower() == normalized:
+            return path
+    raise FileNotFoundError(f"Unknown preset: {identifier}")
+
+
 def load_preset_configs() -> list[RuntimeConfig]:
     return [config_from_dict(json.loads(path.read_text())) for path in list_preset_paths()]
 

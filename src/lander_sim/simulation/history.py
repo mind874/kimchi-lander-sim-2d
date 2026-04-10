@@ -18,6 +18,52 @@ class SimulationSample:
     saturated: bool = False
     events: tuple[dict[str, Any], ...] = ()
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "time_s": self.time_s,
+            "state": {
+                "x": self.state.x,
+                "z": self.state.z,
+                "vx": self.state.vx,
+                "vz": self.state.vz,
+                "theta": self.state.theta,
+                "omega": self.state.omega,
+                "m": self.state.m,
+            },
+            "target": {
+                "x": self.target.x,
+                "z": self.target.z,
+                "vx": self.target.vx,
+                "vz": self.target.vz,
+                "theta": self.target.theta,
+                "omega": self.target.omega,
+                "label": self.target.label,
+            },
+            "abstract_command": {
+                "target_thrust": self.abstract_command.target_thrust,
+                "pitch_torque": self.abstract_command.pitch_torque,
+                "source": self.abstract_command.source,
+                "debug": dict(self.abstract_command.debug),
+            },
+            "actuator_command": {
+                "thrust": self.actuator_command.thrust,
+                "gimbal_angle": self.actuator_command.gimbal_angle,
+                "rcs_torque": self.actuator_command.rcs_torque,
+                "metadata": dict(self.actuator_command.metadata),
+            },
+            "forces": {
+                "thrust_world_x": self.forces.thrust_world_x,
+                "thrust_world_z": self.forces.thrust_world_z,
+                "drag_world_x": self.forces.drag_world_x,
+                "drag_world_z": self.forces.drag_world_z,
+                "external_force_x": self.forces.external_force_x,
+                "external_force_z": self.forces.external_force_z,
+                "torque": self.forces.torque,
+            },
+            "saturated": self.saturated,
+            "events": list(self.events),
+        }
+
 
 @dataclass(slots=True)
 class RunResult:
@@ -80,4 +126,27 @@ class RunResult:
             "state_history": self.state_history,
             "command_history": self.command_history,
             "events": self.events,
+        }
+
+    def to_dict(self) -> dict[str, Any]:
+        analytics_dict: dict[str, Any] | None
+        if self.analytics is None:
+            analytics_dict = None
+        elif hasattr(self.analytics, "__dict__"):
+            analytics_dict = dict(self.analytics.__dict__)
+        else:
+            analytics_dict = {"value": self.analytics}
+
+        return {
+            "run_name": self.run_name,
+            "preset_name": self.preset_name,
+            "controller_mode": self.controller_mode,
+            "allocator_mode": self.allocator_mode,
+            "metadata": dict(self.metadata),
+            "state_history": self.state_history,
+            "command_history": self.command_history,
+            "target_history": self.target_history,
+            "events": list(self.events),
+            "analytics": analytics_dict,
+            "samples": [sample.to_dict() for sample in self.samples],
         }

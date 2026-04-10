@@ -73,6 +73,33 @@ python -m pip install -e . pytest
 python -m lander_sim
 ```
 
+## Running the Electron + React frontend
+
+The repository now includes an Electron shell with a React frontend that talks to
+the same Python simulation core through a local bridge module.
+
+First install the Python environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e . pytest
+```
+
+Then install and run the Electron frontend:
+
+```bash
+npm run electron:install
+npm run electron:dev
+```
+
+Additional Electron commands:
+
+```bash
+npm run electron:build   # build the React renderer
+npm run electron:start   # open Electron against the built renderer
+```
+
 ## Verification
 
 ```bash
@@ -88,6 +115,13 @@ window.run_simulation()
 print(window.current_result.run_name, len(window.current_result.samples))
 window.close()
 PY
+```
+
+Electron/React verification:
+
+```bash
+npm run electron:build
+python -m lander_sim.bridge list-presets
 ```
 
 ## Presets

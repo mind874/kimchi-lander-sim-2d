@@ -1,0 +1,10 @@
+{
+  "name": "kimchi-lander-sim-2d-workspace",
+  "private": true,
+  "scripts": {
+    "electron:install": "npm --prefix electron-app install",
+    "electron:dev": "npm --prefix electron-app run dev",
+    "electron:build": "npm --prefix electron-app run build",
+    "electron:start": "npm --prefix electron-app run start"
+  }
+}

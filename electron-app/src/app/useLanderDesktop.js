@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { exportConfig, getPreset, importConfig, listPresets, runSimulation } from '../shared/bridge/landerClient.js';
+import { diagnostics, exportConfig, getPreset, importConfig, listPresets, runSimulation } from '../shared/bridge/landerClient.js';
 import { setAtPath } from '../shared/utils/configState.js';
 import { usePlayback } from './usePlayback.js';
 
@@ -19,11 +19,13 @@ export function useLanderDesktop() {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('Ready. Load a preset or import a config.');
   const [error, setError] = useState('');
+  const [startupDiagnostics, setStartupDiagnostics] = useState(null);
 
   useEffect(() => {
     let mounted = true;
     async function bootstrap() {
       try {
+        setError('');
         const presetList = await listPresets();
         if (!mounted) return;
         setPresets(presetList);
@@ -34,10 +36,24 @@ export function useLanderDesktop() {
           setConfig(preset.preset);
           setSelectedPreset(first.file_name);
           setStatus(`Loaded ${preset.preset.preset_name}.`);
+          setStartupDiagnostics(null);
         }
       } catch (bridgeError) {
         if (!mounted) return;
+        setConfig(null);
         setError(String(bridgeError.message ?? bridgeError));
+        try {
+          const info = await diagnostics();
+          if (mounted) setStartupDiagnostics(info);
+        } catch (diagnosticError) {
+          if (mounted) {
+            setStartupDiagnostics({
+              ok: false,
+              error: String(diagnosticError.message ?? diagnosticError),
+              pythonCandidates: [],
+            });
+          }
+        }
       }
     }
     bootstrap();
@@ -146,9 +162,41 @@ export function useLanderDesktop() {
     busy,
     status,
     error,
+    startupDiagnostics,
     setSelectedPreset,
     setSampleIndex,
     setPlaying,
+    retryBootstrap: async () => {
+      setConfig(null);
+      setStatus('Retrying bridge bootstrap…');
+      setBusy(false);
+      setPlaying(false);
+      setSampleIndex(0);
+      setError('');
+      try {
+        const presetList = await listPresets();
+        setPresets(presetList);
+        const first = presetList[0];
+        if (first) {
+          const preset = await getPreset(first.file_name);
+          setConfig(preset.preset);
+          setSelectedPreset(first.file_name);
+          setStatus(`Loaded ${preset.preset.preset_name}.`);
+          setStartupDiagnostics(null);
+        }
+      } catch (bridgeError) {
+        setError(String(bridgeError.message ?? bridgeError));
+        try {
+          setStartupDiagnostics(await diagnostics());
+        } catch (diagnosticError) {
+          setStartupDiagnostics({
+            ok: false,
+            error: String(diagnosticError.message ?? diagnosticError),
+            pythonCandidates: [],
+          });
+        }
+      }
+    },
     loadPreset,
     executeRun,
     handleImportConfig,

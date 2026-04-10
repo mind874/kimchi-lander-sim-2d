@@ -67,6 +67,25 @@ async function invokeBridge(commandArgs, payload) {
   throw lastError ?? new Error('No usable Python interpreter found for lander bridge');
 }
 
+async function collectDiagnostics() {
+  try {
+    const presetResult = await invokeBridge(['list-presets']);
+    return {
+      ok: true,
+      repoRoot,
+      pythonCandidates: candidatePythonBins(),
+      presetCount: presetResult?.presets?.length ?? 0,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      repoRoot,
+      pythonCandidates: candidatePythonBins(),
+      error: String(error?.message ?? error),
+    };
+  }
+}
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1700,
@@ -91,6 +110,7 @@ function createWindow() {
 ipcMain.handle('lander:list-presets', async () => invokeBridge(['list-presets']));
 ipcMain.handle('lander:get-preset', async (_event, identifier) => invokeBridge(['get-preset', identifier]));
 ipcMain.handle('lander:run-simulation', async (_event, payload) => invokeBridge(['run'], payload));
+ipcMain.handle('lander:diagnostics', async () => collectDiagnostics());
 ipcMain.handle('lander:save-config', async (_event, payload) => {
   const result = await dialog.showSaveDialog({
     title: 'Save lander configuration',

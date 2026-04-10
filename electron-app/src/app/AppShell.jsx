@@ -4,6 +4,7 @@ import ControllerInspectorPanel from '../features/inspector/ControllerInspectorP
 import MissionPanel from '../features/mission-panel/MissionPanel.jsx';
 import PresetPanel from '../features/preset-panel/PresetPanel.jsx';
 import RunBankPanel from '../features/run-bank/RunBankPanel.jsx';
+import StartupDiagnostics from '../features/workspace/StartupDiagnostics.jsx';
 import StatusFooter from '../features/workspace/StatusFooter.jsx';
 import WorkspaceHeader from '../features/workspace/WorkspaceHeader.jsx';
 import LineChart from '../components/LineChart.jsx';
@@ -45,9 +46,11 @@ export default function AppShell() {
     busy,
     status,
     error,
+    startupDiagnostics,
     setSelectedPreset,
     setSampleIndex,
     setPlaying,
+    retryBootstrap,
     loadPreset,
     executeRun,
     handleImportConfig,
@@ -58,6 +61,9 @@ export default function AppShell() {
   } = useLanderDesktop();
 
   if (!config) {
+    if (error) {
+      return <StartupDiagnostics error={error} diagnostics={startupDiagnostics} onRetry={retryBootstrap} />;
+    }
     return <div className="boot-screen">Loading the Electron bridge and preset library…</div>;
   }
 

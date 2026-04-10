@@ -18,6 +18,10 @@ export async function runSimulation(config) {
   return safeBridge().runSimulation(config);
 }
 
+export async function diagnostics() {
+  return safeBridge().diagnostics();
+}
+
 export async function importConfig() {
   return safeBridge().loadConfig();
 }

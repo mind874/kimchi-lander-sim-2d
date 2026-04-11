@@ -12,6 +12,8 @@ Fastest setup and launch:
 npm start
 ```
 
+That now uses the safer built-Electron path by default.
+
 Equivalent direct script:
 
 ```bash
@@ -24,17 +26,18 @@ Setup only (without launching):
 npm run setup
 ```
 
-Manual launch after setup:
+Development mode with the Vite dev server:
 
 ```bash
-npm run electron:dev
+npm run dev
 ```
 
-Build/start the packaged renderer locally:
+Low-level Electron commands:
 
 ```bash
 npm run electron:build
 npm run electron:start
+npm run electron:dev
 ```
 
 ## Python role in the product

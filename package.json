@@ -4,7 +4,7 @@
   "scripts": {
     "bootstrap": "./scripts/bootstrap.sh",
     "start": "./scripts/start-app.sh",
-    "dev": "./scripts/start-app.sh",
+    "dev": "./scripts/start-app.sh --dev",
     "setup": "./scripts/start-app.sh --setup-only",
     "start:built": "npm run electron:start",
     "python:test": "sh -lc '. .venv/bin/activate && pytest -q'",

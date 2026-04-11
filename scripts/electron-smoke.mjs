@@ -5,14 +5,14 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(__filename), '..');
-const electronDir = path.join(repoRoot, 'electron-app');
 
-const child = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', ['electron', '.'], {
-  cwd: electronDir,
+const child = spawn(process.execPath, [path.join(repoRoot, 'scripts', 'start-app.mjs')], {
+  cwd: repoRoot,
   env: {
     ...process.env,
     LANDER_ELECTRON_SMOKE: '1',
     LANDER_ELECTRON_SMOKE_TIMEOUT_MS: process.env.LANDER_ELECTRON_SMOKE_TIMEOUT_MS ?? '20000',
+    npm_execpath: process.env.npm_execpath ?? '',
   },
   stdio: ['ignore', 'pipe', 'pipe'],
 });

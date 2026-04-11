@@ -17,7 +17,7 @@ That now uses the safer built-Electron path by default.
 Equivalent direct script:
 
 ```bash
-./scripts/start-app.sh
+./scripts/start-app.mjs
 ```
 
 Setup only (without launching):

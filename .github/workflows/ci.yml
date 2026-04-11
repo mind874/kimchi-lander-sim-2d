@@ -1,0 +1,44 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: electron-app/package-lock.json
+
+      - name: Bootstrap project
+        run: ./scripts/bootstrap.sh
+
+      - name: Run Python tests
+        run: npm run python:test
+
+      - name: Verify bridge preset listing
+        run: npm run bridge:list-presets
+
+      - name: Build Electron renderer
+        run: npm run electron:build

@@ -7,23 +7,12 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const rootDir = path.resolve(path.dirname(__filename), '..');
 const mode = process.argv[2] ?? 'launch';
+const electronDir = path.join(rootDir, 'electron-app');
 
-function npmInvocation(args) {
-  if (process.env.npm_execpath) {
-    return {
-      command: process.execPath,
-      args: [process.env.npm_execpath, ...args],
-    };
-  }
-  if (process.platform === 'win32') {
-    return {
-      command: 'npm.cmd',
-      args,
-    };
-  }
+function localNodeModuleScript(modulePath, args = []) {
   return {
-    command: '/usr/bin/env',
-    args: ['npm', ...args],
+    command: process.execPath,
+    args: [path.join(electronDir, 'node_modules', ...modulePath.split('/')), ...args],
   };
 }
 
@@ -47,7 +36,11 @@ function spawnLogged(command, args, options = {}) {
 }
 
 async function ensureEnvironment() {
-  const needsBootstrap = !fs.existsSync(path.join(rootDir, '.venv')) || !fs.existsSync(path.join(rootDir, 'electron-app', 'node_modules'));
+  const needsBootstrap =
+    !fs.existsSync(path.join(rootDir, '.venv')) ||
+    !fs.existsSync(path.join(electronDir, 'node_modules')) ||
+    !fs.existsSync(path.join(electronDir, 'node_modules', 'electron', 'cli.js')) ||
+    !fs.existsSync(path.join(electronDir, 'node_modules', 'vite', 'bin', 'vite.js'));
   if (!needsBootstrap) {
     console.log('Using existing app environment.');
     return;
@@ -58,14 +51,14 @@ async function ensureEnvironment() {
 
 async function buildRenderer() {
   console.log('Building Electron renderer...');
-  const npm = npmInvocation(['--prefix', 'electron-app', 'run', 'build']);
-  await spawnLogged(npm.command, npm.args);
+  const vite = localNodeModuleScript('vite/bin/vite.js', ['build']);
+  await spawnLogged(vite.command, vite.args, { cwd: electronDir });
 }
 
 async function launchElectron(extraEnv = {}) {
   console.log('Starting Kimchi Lander Sim 2D...');
-  const npm = npmInvocation(['--prefix', 'electron-app', 'run', 'start']);
-  await spawnLogged(npm.command, npm.args, { env: extraEnv });
+  const electron = localNodeModuleScript('electron/cli.js', ['.']);
+  await spawnLogged(electron.command, electron.args, { cwd: electronDir, env: extraEnv });
 }
 
 async function main() {
@@ -78,8 +71,7 @@ async function main() {
 
   if (mode === 'dev') {
     console.log('Starting Kimchi Lander Sim 2D in dev mode...');
-    const npm = npmInvocation(['--prefix', 'electron-app', 'run', 'dev']);
-    await spawnLogged(npm.command, npm.args);
+    await spawnLogged(process.execPath, [path.join(electronDir, 'scripts', 'dev.mjs')], { cwd: electronDir });
     return;
   }
 

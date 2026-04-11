@@ -7,6 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const appRoot = path.dirname(__filename);
 
 export default defineConfig({
+  base: './',
   plugins: [react()],
   root: appRoot,
   build: {

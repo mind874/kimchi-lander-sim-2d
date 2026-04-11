@@ -22,6 +22,10 @@ export async function diagnostics() {
   return safeBridge().diagnostics();
 }
 
+export function reportStartupStatus(payload) {
+  return safeBridge().reportStartupStatus(payload);
+}
+
 export async function importConfig() {
   return safeBridge().loadConfig();
 }

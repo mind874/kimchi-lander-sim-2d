@@ -13,6 +13,7 @@
     "electron:install": "npm --prefix electron-app install",
     "electron:dev": "npm --prefix electron-app run dev",
     "electron:build": "npm --prefix electron-app run build",
-    "electron:start": "npm --prefix electron-app run start"
+    "electron:start": "npm --prefix electron-app run start",
+    "electron:smoke": "node ./scripts/electron-smoke.mjs"
   }
 }

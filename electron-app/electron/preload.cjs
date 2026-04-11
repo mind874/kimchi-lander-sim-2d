@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron';
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('landerBridge', {
   listPresets: () => ipcRenderer.invoke('lander:list-presets'),
@@ -7,4 +7,5 @@ contextBridge.exposeInMainWorld('landerBridge', {
   diagnostics: () => ipcRenderer.invoke('lander:diagnostics'),
   saveConfig: (payload) => ipcRenderer.invoke('lander:save-config', payload),
   loadConfig: () => ipcRenderer.invoke('lander:load-config'),
+  reportStartupStatus: (payload) => ipcRenderer.send('lander:startup-status', payload),
 });

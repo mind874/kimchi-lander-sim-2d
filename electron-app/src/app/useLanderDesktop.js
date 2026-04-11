@@ -1,10 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
-import { diagnostics, exportConfig, getPreset, importConfig, listPresets, runSimulation } from '../shared/bridge/landerClient.js';
+import { diagnostics, exportConfig, getPreset, importConfig, listPresets, reportStartupStatus, runSimulation } from '../shared/bridge/landerClient.js';
 import { setAtPath } from '../shared/utils/configState.js';
 import { usePlayback } from './usePlayback.js';
 
 function currentEntryFromState(savedRuns, currentRunId) {
   return savedRuns.find((entry) => entry.id === currentRunId) ?? null;
+}
+
+function safeReportStartupStatus(payload) {
+  try {
+    reportStartupStatus(payload);
+  } catch {
+    // When preload is missing, we still want the diagnostics screen to render.
+  }
 }
 
 export function useLanderDesktop() {
@@ -37,11 +45,13 @@ export function useLanderDesktop() {
           setSelectedPreset(first.file_name);
           setStatus(`Loaded ${preset.preset.preset_name}.`);
           setStartupDiagnostics(null);
+          safeReportStartupStatus({ ok: true, stage: 'bootstrap-ready' });
         }
       } catch (bridgeError) {
         if (!mounted) return;
         setConfig(null);
-        setError(String(bridgeError.message ?? bridgeError));
+        const startupError = String(bridgeError.message ?? bridgeError);
+        setError(startupError);
         try {
           const info = await diagnostics();
           if (mounted) setStartupDiagnostics(info);
@@ -54,6 +64,7 @@ export function useLanderDesktop() {
             });
           }
         }
+        safeReportStartupStatus({ ok: false, stage: 'bridge-bootstrap-failed', error: startupError });
       }
     }
     bootstrap();

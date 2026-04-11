@@ -6,13 +6,25 @@ This is **not a game**. The primary user experience is now the **Electron + Reac
 
 ## Primary frontend: Electron + React
 
-Fastest setup:
+Fastest setup and launch:
 
 ```bash
-./scripts/bootstrap.sh
+npm start
 ```
 
-Launch the primary frontend:
+Equivalent direct script:
+
+```bash
+./scripts/start-app.sh
+```
+
+Setup only (without launching):
+
+```bash
+npm run setup
+```
+
+Manual launch after setup:
 
 ```bash
 npm run electron:dev

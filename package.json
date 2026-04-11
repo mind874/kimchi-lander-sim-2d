@@ -3,8 +3,10 @@
   "private": true,
   "scripts": {
     "bootstrap": "./scripts/bootstrap.sh",
-    "start": "npm run electron:start",
-    "dev": "npm run electron:dev",
+    "start": "./scripts/start-app.sh",
+    "dev": "./scripts/start-app.sh",
+    "setup": "./scripts/start-app.sh --setup-only",
+    "start:built": "npm run electron:start",
     "python:test": "sh -lc '. .venv/bin/activate && pytest -q'",
     "bridge:list-presets": "sh -lc '. .venv/bin/activate && python -m lander_sim bridge list-presets'",
     "bridge:get-stable-hover": "sh -lc '. .venv/bin/activate && python -m lander_sim bridge get-preset stable_hover.json'",
